@@ -26,8 +26,6 @@ fit %>%
   autoplot(gdppc) +
   labs(y = "$US", title = "GDP per capita for Sweden")
 
-
-
 bricks <- aus_production %>%
   filter_index("1970 Q1" ~ "2004 Q4")
 
@@ -36,4 +34,15 @@ bricks %>% model(NAIVE(Bricks)) %>% forecast(h = 10) %>% autoplot(bricks)
 bricks %>% model(SNAIVE(Bricks ~ lag("year"))) %>% forecast(h = 10) %>% autoplot(bricks)
 bricks %>% model(RW(Bricks ~ drift())) %>% forecast(h = 10) %>% autoplot(bricks)
 
+google_stock <- gafa_stock %>%
+  filter(Symbol == "GOOG", year(Date) >= 2015) %>%
+  mutate(day = row_number()) %>%
+  update_tsibble(index = day, regular = TRUE)
+
+# Filter the year of interest
+google_2015 <- google_stock %>% filter(year(Date) == 2015)
+
+google_2015 %>%
+  model(NAIVE(Close)) %>%
+  gg_tsresiduals()
 
