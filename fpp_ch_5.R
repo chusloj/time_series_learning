@@ -46,3 +46,17 @@ google_2015 %>%
   model(NAIVE(Close)) %>%
   gg_tsresiduals()
 
+
+
+us_retail_employment <- us_employment %>%
+  filter(year(Month) >= 1990, Title == "Retail Trade")
+fit_dcmp <- us_retail_employment %>%
+  model(stlf = decomposition_model(
+    STL(Employed ~ trend(window = 7), robust = TRUE)
+    # NAIVE(season_adjust)
+  ))
+fit_dcmp %>%
+  forecast() %>%
+  autoplot(us_retail_employment)+
+  labs(y = "Number of people",
+       title = "Monthly US retail employment")
